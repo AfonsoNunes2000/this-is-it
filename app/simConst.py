@@ -111,7 +111,7 @@ sim_message_object_selection_changed=2
 sim_message_reserved10                =3    # do not use 
 sim_message_model_loaded            =4
 sim_message_reserved11                =5    # do not use 
-sim_message_keypress                =6    # a key was pressed while the focus was on a page (aux[0]=key aux[1]=ctrl and shift key state) 
+sim_message_keypress                =6    # a key was pressed while the focus was on a pageClient (aux[0]=key aux[1]=ctrl and shift key state)
 sim_message_bannerclicked            =7    # a banner was clicked (aux[0]=banner ID) 
 
 
@@ -148,7 +148,7 @@ sim_message_eventcallback_scripticondblclick         =0x11c   # scipt icon was d
 sim_message_eventcallback_simulationabouttostart     =0x11d
 sim_message_eventcallback_simulationended            =0x11e
 sim_message_eventcallback_reserved5                     =0x11f   # do not use 
-sim_message_eventcallback_keypress                     =0x120   # a key was pressed while the focus was on a page (aux[0]=key aux[1]=ctrl and shift key state) 
+sim_message_eventcallback_keypress                     =0x120   # a key was pressed while the focus was on a pageClient (aux[0]=key aux[1]=ctrl and shift key state)
 sim_message_eventcallback_modulehandleinsensingpart  =0x121   # called when simHandleModule in Lua is called with argument true 
 sim_message_eventcallback_renderingpass              =0x122   # called just before the scene is rendered 
 sim_message_eventcallback_bannerclicked              =0x123   # called when a banner was clicked (aux[0]=banner ID) 
