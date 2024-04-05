@@ -1,65 +1,84 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
+import { initializeApp } from 'firebase/app';
+import { getDatabase, ref, onValue, off } from 'firebase/database';
+import { DataSnapshot } from 'firebase/database';
+
+
+// Your Firebase configuration
+const firebaseConfig = {
+ apiKey: "AIzaSyBHcmOa0BfjkaOzF_afetF50msVma3gjIQ",
+ authDomain: "iscf-e2939.firebaseapp.com",
+ databaseURL: "https://iscf-e2939-default-rtdb.europe-west1.firebasedatabase.app/",
+ projectId: "iscf-e2939",
+ storageBucket: "iscf-e2939.appspot.com",
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
 
 interface SensorData {
-  [key: string]: {
+ [key: string]: {
     timestamp: number;
     x: number;
     y: number;
     z: number;
-  };
-
+ };
 }
 
 function Page() {
-  const [fetchedData, setFetchedData] = useState<SensorData | null>(null);
-  const [error, setError] = useState<string | null>(null); // Specify the type of error as string
+ const [latestData, setLatestData] = useState<{name: string; data: SensorData[string] }| null>(null);
+ const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await fetch('https://iscf-e2939-default-rtdb.europe-west1.firebasedatabase.app/sensor_data.json');
-        if (!response.ok) {
-          throw new Error('Failed to fetch data');
+ useEffect(() => {
+    const dbRef = ref(database, 'sensor_data');
+
+    const handleDataChange = (snapshot: DataSnapshot) => {
+      const data: SensorData = snapshot.val();
+      let mostRecentEntry: { name: string; data: SensorData[string] } | null = null;
+      let mostRecentTimestamp = 0;
+      for (const name in data) {
+        if (data.hasOwnProperty(name)) {
+          const sensorData = data[name];
+          if (sensorData.timestamp > mostRecentTimestamp) {
+            mostRecentTimestamp = sensorData.timestamp;
+            mostRecentEntry = { name, data: sensorData };
+          }
         }
-        const result: SensorData = await response.json();
-        setFetchedData(result);
-
-      } catch (error: any) { // Use ': any' to cast the error to any type
-        console.error('Error fetching data:', error);
-        setError(error.message); // Set the error state
       }
-    }
+      setLatestData(mostRecentEntry);
+    };
 
-    fetchData(); // Call the fetchData function
-  }, []);
+    onValue(dbRef, handleDataChange, (error: Error) => {
+      console.error('Error fetching data:', error);
+      setError(error.message);
+    });
 
-  console.log(fetchedData)
+    // Cleanup function to remove the listener when the component unmounts
+    return () => {
+      off(dbRef, 'value', handleDataChange);
+    };
+ }, []);
 
-  return (
+ return (
     <div>
       <p>Hello</p>
-
       {error && <p>Error: {error}</p>}
-
-      {fetchedData && (
+      {latestData && (
         <div>
-          {Object.keys(fetchedData).map((key) => (
-            <div key={key}>
-              <p>Name: {key}</p>
-              <p>Timestamp: {fetchedData[key].timestamp}</p>
-              <p>X: {fetchedData[key].x}</p>
-              <p>Y: {fetchedData[key].y}</p>
-              <p>Z: {fetchedData[key].z}</p>
-            </div>
-          ))}
+          <p>Most Recent Data:</p>
+          <p>Name: {latestData.name}</p>
+          <p>Timestamp: {latestData.data.timestamp}</p>
+          <p>X: {latestData.data.x}</p>
+          <p>Y: {latestData.data.y}</p>
+          <p>Z: {latestData.data.z}</p>
         </div>
       )}
     </div>
-  );
+ );
 }
 
 export default Page;
-
 
