@@ -36,7 +36,6 @@ interface SensorData {
     z: number;
  };
 }
-
 const Page: React.FC = () => {
   const [latestData, setLatestData] = useState<{ name: string; data: SensorData[string] } | null>(null);
   const [error, setError] = useState<string | null>(null);
